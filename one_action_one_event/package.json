@@ -1,0 +1,25 @@
+{
+  "name": "apify",
+  "integrationName": "integration-test/apify",
+  "private": true,
+  "dependencies": {
+    "@botpress/client": "0.24.2",
+    "@botpress/sdk": "0.8.39",
+    "apify-client": "^2.9.4",
+    "axios": "^1.7.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@botpress/cli": "^0.8.45",
+    "@types/node": "^18.19.42",
+    "ts-node": "^10.9.2",
+    "typescript": "^4.9.5"
+  },
+  "scripts": {
+    "check:type": "tsc --noEmit",
+    "version": "bp --version",
+    "login": "bp login",
+    "gen": "bp gen",
+    "deploy": "bp deploy"
+  }
+}
