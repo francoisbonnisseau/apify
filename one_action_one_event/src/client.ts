@@ -105,53 +105,43 @@ export async function createWebhook(args: ActionArgs){
   })
   .then(response => {
     args.logger.forBot().info('API call to Apify (webhook subscription) successful:', response.data);
+    //update webhook with webhookID !
+    const webhookId = response.data.data.id
+    args.logger.forBot().info(`Webhook ID: ${webhookId}`)
+
+    const dataUpdate = {
+      payloadTemplate: `{"webhookId":"${webhookId}","conversationId": "${args.input.conversationId}}", "resource":{{resource}}}`
+    };
+  
+    axios.put(`https://api.apify.com/v2/webhooks/${webhookId}`, dataUpdate, {
+      headers: {
+        Authorization: `Bearer ${args.ctx.configuration.apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      args.logger.forBot().info('API call to Apify (webhook update) successful:', response.data);
+    })
+    .catch(error => {
+      args.logger.forBot().error('Failed to make API call (webhook update) to Apify:', error);
+    });
   })
   .catch(error => {
     args.logger.forBot().error('Failed to make API call (webhook subscription) to Apify:', error);
   });
-}
-
-export async function deleteWebhook(apiKey: String, webhookUrl: String){
-  const offset = 0;
-  const limit = 5;
-  const desc = true;
-
-  // Construire l'URL avec les paramètres de requête
-  const url = `https://api.apify.com/v2/webhooks?offset=${offset}&limit=${limit}&desc=${desc}`;
-
-  // Effectuer la requête
-  await axios.get(url, {
-    headers: {
-      Authorization: `Bearer ${apiKey}`
-    }
-  })
-  .then(async response => {
-    const results = response.data.items;
-    const matchingWebhook = results.find((item: any) =>
-      item.requestUrl === webhookUrl
-    );
-    
-    if(matchingWebhook){
-      const webhookId = matchingWebhook.id;
-      try{
-        await axios.delete(`https://api.apify.com/v2/webhooks/${webhookId}`, {
-          headers: {
-            Authorization: `Bearer ${apiKey}`
-          }
-        });
-      }
-      catch(e:any){
-        throw new sdk.RuntimeError('Failed to make API call (webhook deletion) to Apify:', e);
-      }
-      
-    }
-
-
-  })
-  .catch(error => {
-    throw new sdk.RuntimeError('Failed to make API call (webhook list) to Apify:', error);
-  });
 
   
+}
 
+export async function deleteWebhook(apiKey: String, webhookId: String){
+    try{
+      await axios.delete(`https://api.apify.com/v2/webhooks/${webhookId}`, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`
+        }
+      });
+    }
+    catch(e:any){
+      throw new sdk.RuntimeError('Failed to make API call (webhook deletion) to Apify:', e);
+    }
 }
