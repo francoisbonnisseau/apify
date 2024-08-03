@@ -67,9 +67,9 @@ export default new bp.Integration({
         logger.forBot().debug('Apify scraping completed event created successfully.', event)
 
         //delete Webhook
-        const webhookUrl = `https://webhook.botpress.cloud/${ctx.webhookId}`
+        const webhookId = bodyObject.webhookId
         try{
-          await deleteWebhook(ctx.configuration.apiKey, webhookUrl)
+          await deleteWebhook(ctx.configuration.apiKey, webhookId)
           logger.forBot().info('Webhook deleted successfully.')
         }
         catch (error) {
